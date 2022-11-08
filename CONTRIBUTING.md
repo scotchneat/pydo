@@ -55,3 +55,25 @@ We like these:
     ```sh
     poetry shell
     ```
+
+## Releasing `pydo`
+
+The repo uses GitHub workflows to publish a draft release when a new tag is
+pushed. We use [semver](https://semver.org/#summary) to determine the version
+number vor the tag. 
+
+*Before pushing a tag*, the pyproject version needs to be bumped. 
+
+1. Run `make changes` to review the merged PRs since last release.
+2. Determine the bump type (major, minor, patch). 
+3. Run `BUMP=(bugfix|feature|breaking) make bump_version` to update the `pydo` version.
+    * `BUMP` also accepts `(patch|minor|major)`
+4. Make a pull request with this change. It should be separate from PRs
+   containing chagnes to the library (including regenerated code).
+
+*Once the version bump PR has been pushed*, tag the commit to trigger the
+release workflow.
+
+5. Run `make tag` to tag the latest commit and push the tag to ORIGIN.
+    * To tag an earlier commit, run `COMMIT=${commit} make tag`.
+    * To push the tag to a different remote, run `ORIGIN=${REMOTE} make tag`.
