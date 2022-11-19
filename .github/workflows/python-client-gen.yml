@@ -128,6 +128,7 @@ jobs:
           gh pr create \
             --title "[bot] Re-Generate w/ digitalocean/openapi ${{ github.event.inputs.openapi_short_sha }}" \
             --body-file pr_body.md \
-            --head "${{ env.NEW_BRANCH }}" \-r digitalocean/api-cli
+            --head "${{ env.NEW_BRANCH }}" \
+            # -r digitalocean/api-cli
         env:
           GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
