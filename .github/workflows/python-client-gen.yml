@@ -23,6 +23,7 @@ jobs:
         run: |
           last_commit_sha=$(cat DO_OPENAPI_COMMIT_SHA.txt)
           test $last_commit_sha || (echo "last_commit_sha cannot be empty" && exit 1)
+          echo "last_commit_sha=$last_commit_sha" >> $GITHUB_ENV
 
           last_commit_date=$(
             gh pr --repo digitalocean/openapi list \
@@ -116,9 +117,17 @@ jobs:
           echo "CHANGELIST"
           cat changelist.md
 
-          # gh pr create \
-          #   --title "[bot] Re-Generate w/ digitalocean/openapi ${{ github.event.inputs.openapi_short_sha }}" \
-          #   --body "Regenerate python client with the commit, [${{ github.event.inputs.openapi_short_sha }}](https://github.com/digitalocean/openapi/commit/${{ github.event.inputs.openapi_short_sha }}) , pushed to digitalocean/openapi. Owners must review to confirm if integration/mocked tests need to be added to the client to reflect the changes." \
-          #   --head "${{ env.NEW_BRANCH }}" \-r digitalocean/api-cli
+          echo "Regenerate python client with the commit, \
+                [${{ github.event.inputs.openapi_short_sha }}](https://github.com/digitalocean/openapi/commit/${{ github.event.inputs.openapi_short_sha }}), \
+                pushed to digitalocean/openapi.\n\n \
+                Owners must review to confirm if integration/mocked tests need to be added to the client to reflect the changes.\n\n \
+                The following changes were merged to digitalocean/openapi since the previous commit (${{ env.last_commit_sha }}\n\n" > pr_body.md
+
+          cat changelist.md >> pr_body.md                
+
+          gh pr create \
+            --title "[bot] Re-Generate w/ digitalocean/openapi ${{ github.event.inputs.openapi_short_sha }}" \
+            --body-file pr_body.md \
+            --head "${{ env.NEW_BRANCH }}" \-r digitalocean/api-cli
         env:
           GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
